@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer require:*)",
+      "Bash(php artisan:*)",
+      "Bash(grep -v \"^\\\\s*$\")",
+      "Bash(mysql -u root -e \"CREATE DATABASE IF NOT EXISTS ukk CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(where mysql:*)",
+      "Read(//c/laragon/bin/mysql/**)",
+      "Read(//c/Program Files/**)",
+      "Bash(C:/laragon/bin/mysql/mysql-8.4.3-winx64/bin/mysql.exe:*)",
+      "Bash(php -r \"echo 'PHP OK';\")"
+    ]
+  }
+}
