@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Aspirasi;
 use App\Models\InputAspirasi;
 use App\Models\Kategori;
+use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -13,23 +14,39 @@ class AspirasiController extends Controller
 {
     public function index()
     {
-        $kategoris = Kategori::all();
+        $kategoris  = Kategori::all();
+        $ruangans   = Ruangan::with('penanggungjawab')->get();
+        $aktifCount = Aspirasi::whereHas('inputAspirasi', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->whereNotIn('status', ['Selesai', 'Ditolak'])->count();
 
-        return view('siswa.form', compact('kategoris'));
+        return view('siswa.form', compact('kategoris', 'ruangans', 'aktifCount'));
     }
 
     public function store(Request $request)
     {
+        $aktif = Aspirasi::whereHas('inputAspirasi', function ($q) {
+            $q->where('user_id', auth()->id());
+        })->whereNotIn('status', ['Selesai', 'Ditolak'])->count();
+
+        if ($aktif >= 2) {
+            return back()->with('error', 'Anda sudah memiliki 2 laporan aktif. Tunggu hingga salah satu selesai atau ditolak.');
+        }
+
         $request->validate([
             'id_kategori' => 'required|exists:kategori,id_kategori',
+            'ruangan_id'  => 'required|exists:ruangan,id_ruangan',
             'lokasi'      => 'required|string|max:50',
             'ket'         => 'required|string|max:255',
         ]);
 
         DB::transaction(function () use ($request) {
+            $ruangan = Ruangan::findOrFail($request->ruangan_id);
+
             $input = InputAspirasi::create([
                 'user_id'     => auth()->id(),
                 'id_kategori' => $request->id_kategori,
+                'ruangan_id'  => $request->ruangan_id,
                 'lokasi'      => $request->lokasi,
                 'ket'         => $request->ket,
             ]);
@@ -38,17 +55,18 @@ class AspirasiController extends Controller
                 'id_pelaporan' => $input->id_pelaporan,
                 'id_kategori'  => $request->id_kategori,
                 'status'       => 'Menunggu',
+                'assigned_to'  => $ruangan->penanggung_jawab_id,
             ]);
         });
 
-        return redirect()->route('siswa.riwayat')->with('success', 'Pengaduan berhasil dikirim');
+        return redirect()->route('siswa.riwayat')->with('success', 'Pengaduan berhasil terkirim ke PJ ruangan');
     }
 
     public function riwayat()
     {
         $riwayats = auth()->user()
             ->inputAspirasi()
-            ->with(['kategori', 'aspirasi.assignedTo'])
+            ->with(['kategori', 'ruangan', 'aspirasi.assignedTo'])
             ->latest()
             ->get();
 

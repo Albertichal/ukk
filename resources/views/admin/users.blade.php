@@ -51,7 +51,7 @@
                         <span class="sbadge" style="{{ $badgeCls }}">{{ $badgeLabel }}</span>
                     </td>
                     <td style="font-size:13px;color:var(--muted);">{{ $user->username ?? $user->nis ?? '—' }}</td>
-                    <td style="font-size:13px;color:var(--muted);">{{ $user->kelas ?? '—' }}</td>
+                    <td style="font-size:13px;color:var(--muted);">{{ $user->kelas?->nama_kelas ?? '—' }}</td>
                     <td>
                         <form method="POST" action="{{ route('admin.users.destroy',$user->id) }}"
                               onsubmit="return confirm('Hapus user {{ addslashes($user->name) }}?')">
@@ -120,8 +120,15 @@
                     </div>
                     <div class="field field-siswa" style="display:none;">
                         <label>Kelas</label>
-                        <input type="text" name="kelas" class="inp" value="{{ old('kelas') }}" maxlength="10">
-                        @error('kelas')<div class="err-msg">{{ $message }}</div>@enderror
+                        <select name="kelas_id" class="sel">
+                            <option value="">-- Pilih Kelas --</option>
+                            @foreach($kelas as $k)
+                                <option value="{{ $k->id_kelas }}" {{ old('kelas_id') == $k->id_kelas ? 'selected' : '' }}>
+                                    {{ $k->nama_kelas }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('kelas_id')<div class="err-msg">{{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>

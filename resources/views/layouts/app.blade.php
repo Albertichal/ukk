@@ -248,13 +248,15 @@
             border-radius: 9999px; font-size: 11.5px; font-weight: 700;
             white-space: nowrap;
         }
-        .s-menunggu  { background: #FFF3CD; color: #856404; }
-        .s-diassign  { background: #CFE2FF; color: #084298; }
-        .s-proses    { background: #CFF4FC; color: #055160; }
-        .s-selesai   { background: #D1E7DD; color: #0A3622; }
-        .s-ditolakpj { background: #F8D7DA; color: #842029; }
-        .s-ditolak   { background: #F8D7DA; color: #842029; }
-        .s-diproses  { background: #CFF4FC; color: #055160; }
+        .s-menunggu      { background: #FFF3CD; color: #856404; }
+        .s-diassign      { background: #CFE2FF; color: #084298; }
+        .s-proses        { background: #CFF4FC; color: #055160; }
+        .s-selesai       { background: #D1E7DD; color: #0A3622; }
+        .s-ditolakpj     { background: #F8D7DA; color: #842029; }
+        .s-ditolak       { background: #F8D7DA; color: #842029; }
+        .s-diproses      { background: #CFF4FC; color: #055160; }
+        .s-tidak-mampu   { background: #F8D7DA; color: #842029; }
+        .s-sdikerjakan   { background: #CFE2FF; color: #084298; }
 
         /* ── BUTTONS ── */
         .btn {
@@ -435,6 +437,12 @@
                 </a>
                 <a href="{{ route('admin.kategori') }}" class="nav-link {{ Route::is('admin.kategori') ? 'active' : '' }}">
                     <span class="msym">category</span> Kategori
+                </a>
+                <a href="{{ route('admin.ruangan') }}" class="nav-link {{ Route::is('admin.ruangan') ? 'active' : '' }}">
+                    <span class="msym">meeting_room</span> Ruangan
+                </a>
+                <a href="{{ route('admin.kelas') }}" class="nav-link {{ Route::is('admin.kelas') ? 'active' : '' }}">
+                    <span class="msym">class</span> Kelas
                 </a>
             @elseif(auth()->user()->isSiswa())
                 <div class="nav-sect">Siswa</div>

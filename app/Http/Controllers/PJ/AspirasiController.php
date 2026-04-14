@@ -10,40 +10,61 @@ class AspirasiController extends Controller
 {
     public function index()
     {
-        $aspirasis = Aspirasi::with(['inputAspirasi.user', 'inputAspirasi.kategori', 'kategori'])
+        $aspirasis = Aspirasi::with(['inputAspirasi.user', 'inputAspirasi.kategori', 'inputAspirasi.ruangan'])
             ->where('assigned_to', auth()->id())
-            ->whereIn('status', ['Diassign', 'Proses'])
+            ->whereIn('status', ['Menunggu', 'Proses'])
             ->latest()
             ->get();
 
         $stats = [
-            'assigned' => Aspirasi::where('assigned_to', auth()->id())->whereIn('status', ['Diassign', 'Proses'])->count(),
+            'assigned' => Aspirasi::where('assigned_to', auth()->id())->whereIn('status', ['Menunggu', 'Proses'])->count(),
             'proses'   => Aspirasi::where('assigned_to', auth()->id())->where('status', 'Proses')->count(),
         ];
 
         return view('pj.dashboard', compact('aspirasis', 'stats'));
     }
 
-    public function updateStatus(Request $request, $id)
+    public function terima(Request $request, $id)
     {
         $aspirasi = Aspirasi::where('id_aspirasi', $id)
             ->where('assigned_to', auth()->id())
+            ->where('status', 'Menunggu')
             ->firstOrFail();
 
         $aspirasi->update(['status' => 'Proses']);
 
-        return back()->with('success', 'Status diperbarui menjadi Proses');
+        return back()->with('success', 'Pengaduan diterima dan sedang diproses');
+    }
+
+    public function tidakMampu(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_tolak' => 'required|string|max:500',
+        ]);
+
+        $aspirasi = Aspirasi::where('id_aspirasi', $id)
+            ->where('assigned_to', auth()->id())
+            ->whereIn('status', ['Menunggu', 'Proses'])
+            ->firstOrFail();
+
+        $aspirasi->update([
+            'status'       => 'Tidak_Mampu',
+            'alasan_tolak' => $request->alasan_tolak,
+        ]);
+
+        return back()->with('success', 'Eskalasi ke admin berhasil');
     }
 
     public function selesai(Request $request, $id)
     {
         $aspirasi = Aspirasi::where('id_aspirasi', $id)
             ->where('assigned_to', auth()->id())
+            ->where('status', 'Proses')
             ->firstOrFail();
 
         $aspirasi->update(['status' => 'Selesai']);
 
-        return back()->with('success', 'Perbaikan dilaporkan selesai');
+        return back()->with('success', 'Perbaikan selesai');
     }
 
     public function tolak(Request $request, $id)
@@ -54,14 +75,14 @@ class AspirasiController extends Controller
 
         $aspirasi = Aspirasi::where('id_aspirasi', $id)
             ->where('assigned_to', auth()->id())
-            ->whereIn('status', ['Diassign', 'Proses'])
+            ->whereIn('status', ['Menunggu', 'Proses'])
             ->firstOrFail();
 
         $aspirasi->update([
-            'status'       => 'Ditolak_PJ',
+            'status'       => 'Ditolak',
             'alasan_tolak' => $request->alasan_tolak,
         ]);
 
-        return back()->with('success', 'Pengaduan ditolak, menunggu konfirmasi admin');
+        return back()->with('success', 'Pengaduan ditolak');
     }
 }
