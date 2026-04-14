@@ -81,13 +81,11 @@
                                     <span class="msym">cancel</span>
                                 </button>
                             @elseif($asp->status === 'Proses')
-                                <form method="POST" action="{{ route('pj.selesai',$asp->id_aspirasi) }}"
-                                      onsubmit="return confirm('Tandai sebagai Selesai?')">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-success" style="gap:4px;">
-                                        <span class="msym sz18">check_circle</span> Selesai
-                                    </button>
-                                </form>
+                                <button class="btn btn-sm btn-success" style="gap:4px;"
+                                        data-action="{{ route('pj.selesai',$asp->id_aspirasi) }}"
+                                        onclick="openSelesai(this)">
+                                    <span class="msym sz18">check_circle</span> Selesai
+                                </button>
                                 <button class="btn-icon btn-icon-orange" title="Tidak Mampu"
                                         data-action="{{ route('pj.tidak_mampu',$asp->id_aspirasi) }}"
                                         onclick="openTidakMampu(this)">
@@ -112,6 +110,32 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+</div>
+
+{{-- MODAL Selesai --}}
+<div class="modal-backdrop" id="mSelesai">
+    <div class="modal-box">
+        <div class="modal-hd" style="color:#0A3622;">
+            <span>Tandai Selesai</span>
+            <button class="modal-close" onclick="closeModal('mSelesai')"><span class="msym">close</span></button>
+        </div>
+        <form method="POST" id="formSelesai" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-bd">
+                <div class="field">
+                    <label>Foto Bukti Selesai <span class="req">*</span></label>
+                    <input type="file" name="foto_selesai" class="inp" accept="image/jpg,image/jpeg,image/png" required>
+                    <div style="font-size:11px;color:var(--muted);margin-top:4px;">Format JPG/PNG, maks. 2MB. Wajib diisi.</div>
+                </div>
+            </div>
+            <div class="modal-ft">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('mSelesai')">Batal</button>
+                <button type="submit" class="btn btn-success btn-sm" style="gap:4px;">
+                    <span class="msym sz18">check_circle</span> Konfirmasi Selesai
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -171,6 +195,10 @@
 @endsection
 @push('scripts')
 <script>
+function openSelesai(btn) {
+    document.getElementById('formSelesai').action = btn.dataset.action;
+    openModal('mSelesai');
+}
 function openTidakMampu(btn) {
     document.getElementById('formTidakMampu').action = btn.dataset.action;
     openModal('mTidakMampu');

@@ -45,7 +45,7 @@
                 </div>
             </div>
     @else
-            <form method="POST" action="{{ route('siswa.aspirasi.store') }}">
+            <form method="POST" action="{{ route('siswa.aspirasi.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="field">
@@ -96,6 +96,13 @@
                               required>{{ old('ket') }}</textarea>
                     <div class="char-counter"><span id="ketCt">{{ strlen(old('ket','')) }}</span>/255</div>
                     @error('ket')<div class="err-msg">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="field">
+                    <label><span class="msym sz18" style="vertical-align:middle;margin-right:4px;">photo_camera</span>Foto Laporan <span style="color:var(--muted);font-weight:400;">(opsional)</span></label>
+                    <input type="file" name="foto_laporan" class="inp" accept="image/jpg,image/jpeg,image/png">
+                    <div style="font-size:11px;color:var(--muted);margin-top:4px;">Format JPG/PNG, maks. 2MB</div>
+                    @error('foto_laporan')<div class="err-msg">{{ $message }}</div>@enderror
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;">

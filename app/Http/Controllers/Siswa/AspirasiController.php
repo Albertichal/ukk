@@ -34,14 +34,20 @@ class AspirasiController extends Controller
         }
 
         $request->validate([
-            'id_kategori' => 'required|exists:kategori,id_kategori',
-            'ruangan_id'  => 'required|exists:ruangan,id_ruangan',
-            'lokasi'      => 'required|string|max:50',
-            'ket'         => 'required|string|max:255',
+            'id_kategori'  => 'required|exists:kategori,id_kategori',
+            'ruangan_id'   => 'required|exists:ruangan,id_ruangan',
+            'lokasi'       => 'required|string|max:50',
+            'ket'          => 'required|string|max:255',
+            'foto_laporan' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         DB::transaction(function () use ($request) {
             $ruangan = Ruangan::findOrFail($request->ruangan_id);
+
+            $fotoPath = null;
+            if ($request->hasFile('foto_laporan')) {
+                $fotoPath = $request->file('foto_laporan')->store('aspirasi/laporan', 'public');
+            }
 
             $input = InputAspirasi::create([
                 'user_id'     => auth()->id(),
@@ -56,6 +62,7 @@ class AspirasiController extends Controller
                 'id_kategori'  => $request->id_kategori,
                 'status'       => 'Menunggu',
                 'assigned_to'  => $ruangan->penanggung_jawab_id,
+                'foto_laporan' => $fotoPath,
             ]);
         });
 

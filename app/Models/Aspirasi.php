@@ -16,6 +16,8 @@ class Aspirasi extends Model
         'assigned_to',
         'feedback',
         'alasan_tolak',
+        'foto_laporan',
+        'foto_selesai',
     ];
 
     public function inputAspirasi()

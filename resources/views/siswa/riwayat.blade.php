@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title','Riwayat Pengaduan')
+@php use Illuminate\Support\Facades\Storage; @endphp
 @section('content')
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -25,6 +26,8 @@
                     <th>Status</th>
                     <th>PJ</th>
                     <th>Tanggal</th>
+                    <th>Foto Laporan</th>
+                    <th>Bukti Selesai</th>
                     <th>Keterangan Tolak</th>
                 </tr>
             </thead>
@@ -51,13 +54,22 @@
                     <td><span class="sbadge {{ $display['cls'] }}">{{ $display['label'] }}</span></td>
                     <td style="font-size:13px;">{{ $asp?->assignedTo?->name ?? '—' }}</td>
                     <td style="color:var(--muted);font-size:12px;white-space:nowrap;">{{ $item->created_at->format('d M Y') }}</td>
+                    <td>
+                        @if($asp?->foto_laporan)
+                            <a href="{{ Storage::url($asp->foto_laporan) }}" target="_blank">
+                                <img src="{{ Storage::url($asp->foto_laporan) }}" alt="foto" style="width:40px;height:40px;object-fit:cover;border-radius:4px;border:1px solid #e5e7eb;">
+                            </a>
+                        @else
+                            <span style="color:var(--muted);font-size:12px;">—</span>
+                        @endif
+                    </td>
                     <td style="max-width:180px;font-size:13px;color:#DC2626;">
                         {{ $status === 'Ditolak' ? ($asp?->alasan_tolak ?? '—') : '—' }}
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" style="text-align:center;padding:40px;color:var(--muted);">
+                    <td colspan="9" style="text-align:center;padding:40px;color:var(--muted);">
                         <span class="msym sz28" style="display:block;margin-bottom:8px;opacity:.4;">receipt_long</span>
                         Belum ada pengaduan
                     </td>

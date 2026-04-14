@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title','Dashboard Admin')
+@php use Illuminate\Support\Facades\Storage; @endphp
 @section('content')
 
 {{-- Stats --}}
@@ -59,6 +60,7 @@
                     <th>Lokasi</th>
                     <th>Keterangan</th>
                     <th>Status</th>
+                    <th>Foto</th>
                     <th>PJ</th>
                     <th>Aksi</th>
                 </tr>
@@ -85,6 +87,15 @@
                     <td style="max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $asp->inputAspirasi?->lokasi ?? '—' }}</td>
                     <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);font-size:13px;">{{ $asp->inputAspirasi?->ket ?? '—' }}</td>
                     <td><span class="sbadge {{ $cls }}">{{ str_replace('_',' ',$s) }}</span></td>
+                    <td>
+                        @if($asp->foto_laporan)
+                            <a href="{{ Storage::url($asp->foto_laporan) }}" target="_blank">
+                                <img src="{{ Storage::url($asp->foto_laporan) }}" alt="foto" style="width:40px;height:40px;object-fit:cover;border-radius:4px;border:1px solid #e5e7eb;">
+                            </a>
+                        @else
+                            <span style="color:var(--muted);font-size:12px;">—</span>
+                        @endif
+                    </td>
                     <td style="font-size:13px;">{{ $asp->assignedTo?->name ?? '—' }}</td>
                     <td>
                         <div style="display:flex;gap:4px;flex-wrap:wrap;">
@@ -101,20 +112,18 @@
                                     <span class="msym">cancel</span>
                                 </button>
                             @elseif($s === 'Sedang_Dikerjakan')
-                                <form method="POST" action="{{ route('admin.selesai',$asp->id_aspirasi) }}"
-                                      onsubmit="return confirm('Tandai selesai?')">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm btn-success" style="gap:4px;">
-                                        <span class="msym sz18">check_circle</span> Selesai
-                                    </button>
-                                </form>
+                                <button class="btn btn-sm btn-success" style="gap:4px;"
+                                        data-action="{{ route('admin.selesai',$asp->id_aspirasi) }}"
+                                        onclick="openAdminSelesai(this)">
+                                    <span class="msym sz18">check_circle</span> Selesai
+                                </button>
                             @endif
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="9" style="text-align:center;padding:40px;color:var(--muted);">
+                    <td colspan="10" style="text-align:center;padding:40px;color:var(--muted);">
                         <span class="msym sz28" style="display:block;margin-bottom:8px;opacity:.4;">inbox</span>
                         Belum ada eskalasi masuk
                     </td>
@@ -122,6 +131,32 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+</div>
+
+{{-- MODAL Selesai Admin --}}
+<div class="modal-backdrop" id="mSelesaiAdmin">
+    <div class="modal-box">
+        <div class="modal-hd" style="color:#0A3622;">
+            <span>Tandai Selesai</span>
+            <button class="modal-close" onclick="closeModal('mSelesaiAdmin')"><span class="msym">close</span></button>
+        </div>
+        <form method="POST" id="formSelesaiAdmin" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-bd">
+                <div class="field">
+                    <label>Foto Bukti Selesai <span class="req">*</span></label>
+                    <input type="file" name="foto_selesai" class="inp" accept="image/jpg,image/jpeg,image/png" required>
+                    <div style="font-size:11px;color:var(--muted);margin-top:4px;">Format JPG/PNG, maks. 2MB. Wajib diisi.</div>
+                </div>
+            </div>
+            <div class="modal-ft">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal('mSelesaiAdmin')">Batal</button>
+                <button type="submit" class="btn btn-success btn-sm" style="gap:4px;">
+                    <span class="msym sz18">check_circle</span> Konfirmasi Selesai
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -152,6 +187,10 @@
 @endsection
 @push('scripts')
 <script>
+function openAdminSelesai(btn) {
+    document.getElementById('formSelesaiAdmin').action = btn.dataset.action;
+    openModal('mSelesaiAdmin');
+}
 function setTolakAction(url) {
     document.getElementById('formTolakAdmin').action = url;
     openModal('mTolakAdmin');

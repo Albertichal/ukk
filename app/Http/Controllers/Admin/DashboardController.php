@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Aspirasi;
 use App\Models\Ruangan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -56,11 +57,20 @@ class DashboardController extends Controller
 
     public function selesai(Request $request, $id)
     {
+        $request->validate([
+            'foto_selesai' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
         $aspirasi = Aspirasi::where('id_aspirasi', $id)
             ->where('status', 'Sedang_Dikerjakan')
             ->firstOrFail();
 
-        $aspirasi->update(['status' => 'Selesai']);
+        $fotoPath = $request->file('foto_selesai')->store('aspirasi/selesai', 'public');
+
+        $aspirasi->update([
+            'status'       => 'Selesai',
+            'foto_selesai' => $fotoPath,
+        ]);
 
         return back()->with('success', 'Pengaduan ditandai selesai');
     }

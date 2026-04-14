@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\RuanganController;
 use App\Http\Controllers\Admin\KelasController;
+use App\Http\Controllers\Admin\PantauController;
 use App\Http\Controllers\Siswa\AspirasiController;
 use App\Http\Controllers\PJ\AspirasiController as PJAspirasiController;
 
@@ -39,6 +40,9 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/kelas',                   [KelasController::class, 'index'])->name('admin.kelas');
     Route::post('/kelas',                  [KelasController::class, 'store'])->name('admin.kelas.store');
     Route::delete('/kelas/{id}',           [KelasController::class, 'destroy'])->name('admin.kelas.destroy');
+
+    Route::get('/pantau',                  [PantauController::class, 'index'])->name('admin.pantau');
+    Route::get('/pantau/{id}',             [PantauController::class, 'show'])->name('admin.pantau.show');
 });
 
 // Siswa

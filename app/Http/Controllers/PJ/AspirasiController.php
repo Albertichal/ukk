@@ -5,6 +5,7 @@ namespace App\Http\Controllers\PJ;
 use App\Http\Controllers\Controller;
 use App\Models\Aspirasi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AspirasiController extends Controller
 {
@@ -57,12 +58,21 @@ class AspirasiController extends Controller
 
     public function selesai(Request $request, $id)
     {
+        $request->validate([
+            'foto_selesai' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+
         $aspirasi = Aspirasi::where('id_aspirasi', $id)
             ->where('assigned_to', auth()->id())
             ->where('status', 'Proses')
             ->firstOrFail();
 
-        $aspirasi->update(['status' => 'Selesai']);
+        $fotoPath = $request->file('foto_selesai')->store('aspirasi/selesai', 'public');
+
+        $aspirasi->update([
+            'status'      => 'Selesai',
+            'foto_selesai' => $fotoPath,
+        ]);
 
         return back()->with('success', 'Perbaikan selesai');
     }

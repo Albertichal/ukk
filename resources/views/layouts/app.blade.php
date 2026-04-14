@@ -444,6 +444,9 @@
                 <a href="{{ route('admin.kelas') }}" class="nav-link {{ Route::is('admin.kelas') ? 'active' : '' }}">
                     <span class="msym">class</span> Kelas
                 </a>
+                <a href="{{ route('admin.pantau') }}" class="nav-link {{ Route::is('admin.pantau*') ? 'active' : '' }}">
+                    <span class="msym">visibility</span> Pantau Ruangan
+                </a>
             @elseif(auth()->user()->isSiswa())
                 <div class="nav-sect">Siswa</div>
                 <a href="{{ route('siswa.dashboard') }}" class="nav-link {{ Route::is('siswa.dashboard') ? 'active' : '' }}">
@@ -537,6 +540,9 @@
                 </a>
                 <a href="{{ route('admin.kategori') }}" class="bn-item {{ Route::is('admin.kategori') ? 'active' : '' }}">
                     <span class="msym">category</span><span>Kategori</span>
+                </a>
+                <a href="{{ route('admin.pantau') }}" class="bn-item {{ Route::is('admin.pantau*') ? 'active' : '' }}">
+                    <span class="msym">visibility</span><span>Pantau</span>
                 </a>
             @elseif(auth()->user()->isSiswa())
                 <a href="{{ route('siswa.dashboard') }}" class="bn-item {{ Route::is('siswa.dashboard') ? 'active' : '' }}">
